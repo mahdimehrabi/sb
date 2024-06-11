@@ -81,7 +81,7 @@ func TestService_Create(t *testing.T) {
 			},
 			userRepoMock: func() *repository.MockUser {
 				userRepoMock := repository.NewMockUser(ctrl)
-				userRepoMock.EXPECT().Create(gomock.Any(), gomock.Any()).MinTimes(2).Return(nil)
+				userRepoMock.EXPECT().Create(gomock.Any(), gomock.Any()).MinTimes(2).Return(int64(0), err)
 				return userRepoMock
 			},
 			addresses: []*entity.Address{entity.NewAddress("c", "s", "co", "str", "3tgdsgds")},
@@ -97,7 +97,7 @@ func TestService_Create(t *testing.T) {
 			service := NewService(loggerMock, addressRepoMock, userRepoMock)
 			service.Create(test.addresses, test.user)
 
-			time.Sleep(500 * time.Millisecond)
+			time.Sleep(600 * time.Millisecond)
 			loggerMock.EXPECT()
 			addressRepoMock.EXPECT()
 			userRepoMock.EXPECT()
@@ -133,91 +133,108 @@ func BenchmarkService_Create(b *testing.B) {
 	userRepoMock.EXPECT()
 }
 
-//
-//func TestService_Detail(t *testing.T) {
-//	ctrl := gomock.NewController(t)
-//	t.Cleanup(func() {
-//		ctrl.Finish()
-//	})
-//	err := errors.New("error")
-//	address := entity.NewAddress("c", "s", "co", "str", "3tgdsgds")
-//
-//	var tests = []struct {
-//		name            string
-//		id              int64
-//		loggerMock      func() *mock_log.MockLog
-//		addressRepoMock func() *repository.MockAddress
-//		error           error
-//		ctx             context.Context
-//		returnedAddress *entity.Address
-//	}{
-//		{
-//			name: "success",
-//			loggerMock: func() *mock_log.MockLog {
-//				loggerInfra := mock_log.NewMockLog(ctrl)
-//				return loggerInfra
-//			},
-//			addressRepoMock: func() *repository.MockAddress {
-//				repoLogMock := repository.NewMockAddress(ctrl)
-//				repoLogMock.EXPECT().Detail(gomock.Any(), gomock.Any()).Return(address, nil)
-//				return repoLogMock
-//			},
-//			id:              1,
-//			error:           nil,
-//			ctx:             context.Background(),
-//			returnedAddress: address,
-//		},
-//		{
-//			name: "RepoError",
-//			loggerMock: func() *mock_log.MockLog {
-//				loggerInfra := mock_log.NewMockLog(ctrl)
-//				loggerInfra.EXPECT().Error(err).Return()
-//				return loggerInfra
-//			},
-//			addressRepoMock: func() *repository.MockAddress {
-//				repoLogMock := repository.NewMockAddress(ctrl)
-//				repoLogMock.EXPECT().Detail(gomock.Any(), gomock.Any()).Return(nil, err)
-//				return repoLogMock
-//			},
-//			id:              1,
-//			error:           err,
-//			ctx:             context.Background(),
-//			returnedAddress: nil,
-//		},
-//	}
-//
-//	for _, test := range tests {
-//		t.Run(test.name, func(t *testing.T) {
-//			logRepoMock := test.addressRepoMock()
-//			loggerMock := test.loggerMock()
-//			service := NewService(loggerMock, logRepoMock)
-//			resAddress, err := service.Detail(test.ctx, test.id)
-//			if !errors.Is(err, test.error) {
-//				t.Error("error is not equal")
-//			}
-//
-//			if !gomock.Eq(resAddress).Matches(test.returnedAddress) {
-//				t.Error("returned address_user is not right")
-//			}
-//			loggerMock.EXPECT()
-//			logRepoMock.EXPECT()
-//		})
-//	}
-//}
-//
-//func BenchmarkService_Detail(b *testing.B) {
-//	ctrl := gomock.NewController(b)
-//	addressRepoMock := repository.NewMockAddress(ctrl)
-//	address := entity.NewAddress("c", "s", "co", "str", "3tgdsgds")
-//	addressRepoMock.EXPECT().Detail(gomock.Any(), int64(1)).Return(address, nil)
-//	loggerMock := mock_log.NewMockLog(ctrl)
-//	b.ResetTimer()
-//	service := NewService(loggerMock, addressRepoMock)
-//
-//	service.Detail(context.Background(), int64(1))
-//	if b.Elapsed() > 150*time.Microsecond {
-//		b.Error("address_user service-detail takes too long to run")
-//	}
-//	loggerMock.EXPECT()
-//	addressRepoMock.EXPECT()
-//}
+func TestService_Detail(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	t.Cleanup(func() {
+		ctrl.Finish()
+	})
+	err := errors.New("error")
+
+	var tests = []struct {
+		name         string
+		id           int64
+		loggerMock   func() *mock_log.MockLog
+		userRepoMock func() *repository.MockUser
+		error        error
+		ctx          context.Context
+		returnedUser *entity.User
+	}{
+		{
+			name: "success",
+			loggerMock: func() *mock_log.MockLog {
+				loggerInfra := mock_log.NewMockLog(ctrl)
+				return loggerInfra
+			},
+			userRepoMock: func() *repository.MockUser {
+				userRepoMock := repository.NewMockUser(ctrl)
+				userRepoMock.EXPECT().Detail(gomock.Any(), gomock.Any()).Return(&entity.User{
+					Name: "SFAsfa",
+					Address: []*entity.Address{{
+						City:    "saffsa",
+						ZipCode: "sfafs",
+					}},
+				}, nil)
+				return userRepoMock
+			},
+			id:    1,
+			error: nil,
+			ctx:   context.Background(),
+			returnedUser: &entity.User{
+				Name: "SFAsfa",
+				Address: []*entity.Address{{
+					City:    "saffsa",
+					ZipCode: "sfafs",
+				}},
+			},
+		},
+		{
+			name: "RepoError",
+			loggerMock: func() *mock_log.MockLog {
+				loggerInfra := mock_log.NewMockLog(ctrl)
+				loggerInfra.EXPECT().Error(err).Return()
+				return loggerInfra
+			},
+			userRepoMock: func() *repository.MockUser {
+				userRepoMock := repository.NewMockUser(ctrl)
+				userRepoMock.EXPECT().Detail(gomock.Any(), gomock.Any()).Return(nil, err)
+				return userRepoMock
+			},
+			id:           1,
+			error:        err,
+			ctx:          context.Background(),
+			returnedUser: nil,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			addrRepoMock := repository.NewMockAddress(ctrl)
+			userRepoMock := test.userRepoMock()
+			loggerMock := test.loggerMock()
+			service := NewService(loggerMock, addrRepoMock, userRepoMock)
+			res, err := service.Detail(test.ctx, test.id)
+			if !errors.Is(err, test.error) {
+				t.Error("error is not equal")
+			}
+
+			if !gomock.Eq(res).Matches(test.returnedUser) {
+				t.Error("returned user is not right")
+			}
+			loggerMock.EXPECT()
+			userRepoMock.EXPECT()
+		})
+	}
+}
+
+func BenchmarkService_Detail(b *testing.B) {
+	ctrl := gomock.NewController(b)
+	addressRepoMock := repository.NewMockAddress(ctrl)
+	userRepoMock := repository.NewMockUser(ctrl)
+	userRepoMock.EXPECT().Detail(gomock.Any(), gomock.Any()).Return(&entity.User{
+		Name: "SFAsfa",
+		Address: []*entity.Address{{
+			City:    "saffsa",
+			ZipCode: "sfafs",
+		}},
+	}, nil)
+
+	loggerMock := mock_log.NewMockLog(ctrl)
+	b.ResetTimer()
+	service := NewService(loggerMock, addressRepoMock, userRepoMock)
+
+	service.Detail(context.Background(), int64(1))
+	if b.Elapsed() > 150*time.Microsecond {
+		b.Error("address_user service-detail takes too long to run")
+	}
+	loggerMock.EXPECT()
+}

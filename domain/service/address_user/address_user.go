@@ -50,17 +50,17 @@ func (s Service) startWorkers() {
 func (s Service) worker() {
 	for job := range s.queue {
 		for repeat := 0; repeat < 10; repeat++ {
-			if s.work(job) {
+			if s.work(&job) {
 				break
 			}
 			if repeat == 10 {
-				s.logger.Error(fmt.Errorf("failed to insert %s, cancelling", job))
+				s.logger.Error(fmt.Errorf("failed to insert %v, cancelling", job))
 			}
 		}
 	}
 }
 
-func (s Service) work(job job) (done bool) {
+func (s Service) work(job *job) (done bool) {
 	defer func() {
 		if !done {
 			//cool down before retry
@@ -117,11 +117,11 @@ func (s Service) createUser(ctx context.Context, user *entity.User) (int64, erro
 	return id, err
 }
 
-func (s Service) Detail(ctx context.Context, id int64) (*entity.Address, error) {
-	article, err := s.articleRepository.Detail(ctx, id)
+func (s Service) Detail(ctx context.Context, id int64) (*entity.User, error) {
+	user, err := s.userRepository.Detail(ctx, id)
 	if err != nil {
 		s.logger.Error(err)
 		return nil, err
 	}
-	return article, nil
+	return user, nil
 }
