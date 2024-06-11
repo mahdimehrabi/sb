@@ -38,8 +38,8 @@ func (r AddressRepository) BatchCreate(ctx context.Context, addresses []*entity.
 	batch := &pgx.Batch{}
 
 	for _, address := range addresses {
-		sql := `INSERT INTO addresses (street, city, state, zip_code, country) VALUES($1, $2, $3, $4, $5)`
-		batch.Queue(sql, address.Street, address.City, address.State, address.ZipCode, address.Country)
+		sql := `INSERT INTO addresses (street, city, state, zip_code, country,user_id) VALUES($1, $2, $3, $4, $5,$6)`
+		batch.Queue(sql, address.Street, address.City, address.State, address.ZipCode, address.Country, address.UserID)
 	}
 
 	batchResults := r.conn.SendBatch(ctx, batch)

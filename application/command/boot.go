@@ -2,11 +2,9 @@ package command
 
 import (
 	"bufio"
-	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/jackc/pgx/v5/pgxpool"
 	"log"
 	"m1-article-service/application/command/requests"
 	"m1-article-service/domain/repository/address/pgx"
@@ -14,6 +12,7 @@ import (
 	"m1-article-service/domain/service/address_user"
 	"m1-article-service/infrastructure/godotenv"
 	"m1-article-service/infrastructure/log/zerolog"
+	pgxInfra "m1-article-service/infrastructure/pgx"
 	"os"
 	"strconv"
 	"strings"
@@ -24,7 +23,7 @@ func Boot(filePath string) {
 	logger := zerolog.NewLogger()
 	env := godotenv.NewEnv()
 	env.Load()
-	conn, err := pgxpool.New(context.Background(), env.DATABASE_HOST)
+	conn, err := pgxInfra.SetupPool(env.DATABASE_HOST)
 	if err != nil {
 		logger.Error(err)
 		panic(err)
