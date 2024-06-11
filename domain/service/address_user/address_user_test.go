@@ -3,6 +3,7 @@ package address_user
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/golang/mock/gomock"
 	"m1-article-service/domain/entity"
 	mock_log "m1-article-service/mock/infrastructure"
@@ -104,24 +105,33 @@ func TestService_Create(t *testing.T) {
 	}
 }
 
-//
-//func BenchmarkService_Create(b *testing.B) {
-//	ctrl := gomock.NewController(b)
-//	addressRepoMock := repository.NewMockAddress(ctrl)
-//	addressRepoMock.EXPECT().Create(gomock.Any(), gomock.Any()).Return(int64(1), nil)
-//	loggerMock := mock_log.NewMockLog(ctrl)
-//	b.ResetTimer()
-//	service := NewService(loggerMock, addressRepoMock)
-//	service.Create([]*entity.Address{entity.NewAddress("c", "s", "co",
-//		"str", "3tgdsgds")}, &entity.User{Name: "Fsfa", Lastname: "fsafsa"})
-//	fmt.Println(b.Elapsed())
-//	if b.Elapsed() > 150*time.Microsecond {
-//		b.Error("address_user service-createBatchAddresses takes too long to run")
-//	}
-//	loggerMock.EXPECT()
-//	addressRepoMock.EXPECT()
-//
-//}
+func BenchmarkService_Create(b *testing.B) {
+	ctrl := gomock.NewController(b)
+	addrRepoMock := repository.NewMockAddress(ctrl)
+	addrRepoMock.EXPECT().BatchCreate(gomock.Any(), gomock.Any()).Return(nil)
+	userRepoMock := repository.NewMockUser(ctrl)
+	userRepoMock.EXPECT().Create(gomock.Any(), gomock.Any()).Return(int64(1), nil)
+	loggerMock := mock_log.NewMockLog(ctrl)
+	b.ResetTimer()
+	service := NewService(loggerMock, addrRepoMock, userRepoMock)
+	service.Create([]*entity.Address{entity.NewAddress("c", "s", "co",
+		"str", "3tgdsgds")}, &entity.User{Name: "Fsfa", Lastname: "fsafsa"})
+	fmt.Println(b.Elapsed())
+	//wait for queue and goroutines
+	for {
+		if len(service.queue) == 0 {
+			time.Sleep(200 * time.Microsecond)
+			break
+		}
+	}
+	if b.Elapsed() > 350*time.Millisecond {
+		b.Error("address_user service-createBatchAddresses takes too long to run")
+	}
+	loggerMock.EXPECT()
+	addrRepoMock.EXPECT()
+	userRepoMock.EXPECT()
+}
+
 //
 //func TestService_Detail(t *testing.T) {
 //	ctrl := gomock.NewController(t)
