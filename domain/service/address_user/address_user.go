@@ -2,6 +2,7 @@ package address_user
 
 import (
 	"context"
+	"errors"
 	"m1-article-service/domain/entity"
 	"m1-article-service/domain/repository/address"
 	"m1-article-service/domain/repository/user"
@@ -11,6 +12,8 @@ import (
 
 const maxWorkerCount = 10
 const queueLength = 1000
+
+var ErrServiceUnavailable = errors.New("service unavailable")
 
 type job struct {
 	addresses []*entity.Address
@@ -69,11 +72,15 @@ func (s Service) worker() {
 }
 
 // I just implemented worker pool design for create because lack of time
-func (s Service) Create(addresses []*entity.Address, user *entity.User) {
+func (s Service) Create(addresses []*entity.Address, user *entity.User) error {
+	if len(s.queue) == queueLength {
+		return ErrServiceUnavailable
+	}
 	s.queue <- job{
 		addresses: addresses,
 		user:      user,
 	}
+	return nil
 }
 
 func (s Service) createBatchAddresses(ctx context.Context, addresses []*entity.Address) error {

@@ -3,9 +3,9 @@ package entity
 import "strings"
 
 type User struct {
-	ID       int64  `json:"id"`
-	Name     string `json:"name"`
-	Lastname string `json:"lastname"`
+	ID       int64
+	Name     string
+	Lastname string
 }
 
 func NewUser(name string) *User {

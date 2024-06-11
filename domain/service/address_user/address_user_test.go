@@ -120,6 +120,7 @@ func BenchmarkService_Create(b *testing.B) {
 	//wait for queue and goroutines
 	for {
 		if len(service.queue) == 0 {
+			//mock excepts will fail if goroutines call don't executed in 200microseconds
 			time.Sleep(200 * time.Microsecond)
 			break
 		}

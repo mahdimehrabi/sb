@@ -1,13 +1,13 @@
 package entity
 
 type Address struct {
-	ID      int64  `json:"id"`
-	City    string `json:"city"`
-	State   string `json:"state"`
-	Country string `json:"country"`
-	Street  string `json:"street"`
-	ZipCode string `json:"zipCode"`
-	UserID  int64  `json:"userID"`
+	ID      int64
+	City    string
+	State   string
+	Country string
+	Street  string
+	ZipCode string
+	UserID  int64
 }
 
 func NewAddress(city, state, country, street, zipCode string) *Address {
