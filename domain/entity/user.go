@@ -3,10 +3,10 @@ package entity
 import "strings"
 
 type User struct {
-	ID       int64
-	Name     string
-	Lastname string
-	Address  []*Address
+	ID        int64
+	Name      string
+	Lastname  string
+	Addresses []*Address
 }
 
 func NewUser(name string) *User {

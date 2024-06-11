@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"m1-article-service/domain/entity"
 	"m1-article-service/domain/repository/address"
-	"m1-article-service/domain/repository/user"
+	userRepo "m1-article-service/domain/repository/user"
 	loggerInfra "m1-article-service/infrastructure/log"
 	"time"
 )
@@ -25,12 +25,12 @@ type job struct {
 
 type Service struct {
 	articleRepository address.Address
-	userRepository    user.User
+	userRepository    userRepo.User
 	logger            loggerInfra.Logger
 	queue             chan job
 }
 
-func NewService(logger loggerInfra.Logger, addressRepo address.Address, userRepo user.User) *Service {
+func NewService(logger loggerInfra.Logger, addressRepo address.Address, userRepo userRepo.User) *Service {
 	s := &Service{
 		articleRepository: addressRepo,
 		userRepository:    userRepo,
@@ -120,6 +120,9 @@ func (s Service) createUser(ctx context.Context, user *entity.User) (int64, erro
 func (s Service) Detail(ctx context.Context, id int64) (*entity.User, error) {
 	user, err := s.userRepository.Detail(ctx, id)
 	if err != nil {
+		if errors.Is(err, userRepo.ErrNotFound) {
+			return nil, err
+		}
 		s.logger.Error(err)
 		return nil, err
 	}

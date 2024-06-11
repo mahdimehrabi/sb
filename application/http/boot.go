@@ -28,7 +28,8 @@ func Boot() {
 	addressUser := handlers.NewAddressUser(addrService)
 
 	//I must define router struct but for lack of time I call handler(controller) directly
-	r.POST("/api/articles", addressUser.CreateUser)
+	r.POST("/api/users", addressUser.CreateUser)
+	r.GET("/api/users/:id", addressUser.DetailUser)
 
 	r.Run()
 }

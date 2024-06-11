@@ -12,7 +12,7 @@ import (
 	gomock "github.com/golang/mock/gomock"
 )
 
-// MockAddress is a mock of Address interface.
+// MockAddress is a mock of Addresses interface.
 type MockAddress struct {
 	ctrl     *gomock.Controller
 	recorder *MockAddressMockRecorder

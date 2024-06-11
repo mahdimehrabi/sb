@@ -6,7 +6,7 @@
 # Create a user with its addresses using http
 ```
 curl -X POST \
-http://localhost:8080/api/articles \
+http://localhost:8080/api/users \
 -H 'Content-Type: application/json' \
 -d '{
 "name": "John",

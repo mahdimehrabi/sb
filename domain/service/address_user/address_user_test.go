@@ -159,7 +159,7 @@ func TestService_Detail(t *testing.T) {
 				userRepoMock := repository.NewMockUser(ctrl)
 				userRepoMock.EXPECT().Detail(gomock.Any(), gomock.Any()).Return(&entity.User{
 					Name: "SFAsfa",
-					Address: []*entity.Address{{
+					Addresses: []*entity.Address{{
 						City:    "saffsa",
 						ZipCode: "sfafs",
 					}},
@@ -171,7 +171,7 @@ func TestService_Detail(t *testing.T) {
 			ctx:   context.Background(),
 			returnedUser: &entity.User{
 				Name: "SFAsfa",
-				Address: []*entity.Address{{
+				Addresses: []*entity.Address{{
 					City:    "saffsa",
 					ZipCode: "sfafs",
 				}},
@@ -222,7 +222,7 @@ func BenchmarkService_Detail(b *testing.B) {
 	userRepoMock := repository.NewMockUser(ctrl)
 	userRepoMock.EXPECT().Detail(gomock.Any(), gomock.Any()).Return(&entity.User{
 		Name: "SFAsfa",
-		Address: []*entity.Address{{
+		Addresses: []*entity.Address{{
 			City:    "saffsa",
 			ZipCode: "sfafs",
 		}},
