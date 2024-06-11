@@ -1,5 +1,9 @@
+### Checkout Makefile for database migrations
 
-# Create a user with its addresses
+### Create user and addresses using file
+```go run ./cmd/main.go -file=users_data.json```
+
+# Create a user with its addresses using http
 ```
 curl -X POST \
 http://localhost:8080/api/articles \

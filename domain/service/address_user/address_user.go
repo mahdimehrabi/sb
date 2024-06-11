@@ -12,7 +12,7 @@ import (
 )
 
 const maxWorkerCount = 10
-const queueLength = 1000
+const queueLength = 5000
 
 var ErrServiceUnavailable = errors.New("service unavailable")
 
