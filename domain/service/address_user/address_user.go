@@ -53,8 +53,10 @@ func (s Service) worker() {
 			if s.work(job) {
 				break
 			}
+			if repeat == 10 {
+				s.logger.Error(fmt.Errorf("failed to insert %s, cancelling", job))
+			}
 		}
-		s.logger.Error(fmt.Errorf("failed to insert %s, cancelling", job))
 	}
 }
 

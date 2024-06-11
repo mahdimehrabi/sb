@@ -23,7 +23,7 @@ func NewUserRepository(env *godotenv.Env, conn *pgxpool.Pool) *UserRepository {
 }
 
 func (r UserRepository) Create(ctx context.Context, user *entity.User) (int64, error) {
-	sql := `INSERT INTO user_user (name, lastname) VALUES($1, $2) RETURNING id`
+	sql := `INSERT INTO users (firstname, lastname) VALUES($1, $2) RETURNING id`
 	err := r.conn.QueryRow(ctx, sql, user.Name, user.Lastname).Scan(&user.ID)
 	if err != nil {
 		return 0, err
@@ -33,7 +33,7 @@ func (r UserRepository) Create(ctx context.Context, user *entity.User) (int64, e
 
 func (r UserRepository) Detail(ctx context.Context, userID int64) (user *entity.User, err error) {
 	user = new(entity.User)
-	sql := `SELECT id, name, lastname FROM user_user WHERE id=$1`
+	sql := `SELECT id, firstname, lastname FROM users WHERE id=$1`
 	err = r.conn.QueryRow(ctx, sql, userID).Scan(&user.ID, &user.Name, &user.Lastname)
 	if err != nil {
 		return nil, err
