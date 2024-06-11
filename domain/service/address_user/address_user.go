@@ -6,16 +6,16 @@ import (
 	"m1-article-service/domain/repository/address"
 	"m1-article-service/domain/repository/user"
 	loggerInfra "m1-article-service/infrastructure/log"
+	"time"
 )
 
 const maxWorkerCount = 10
 const queueLength = 1000
 
 type job struct {
-	address       *entity.Address
-	user          *entity.User
-	addressIdChan chan<- int64
-	userIDChan    chan<- int64
+	addresses []*entity.Address
+	user      *entity.User
+	userID    int64
 	//can hold task type , but we don't need it now
 }
 
@@ -26,12 +26,15 @@ type Service struct {
 	queue             chan job
 }
 
-func NewService(logger loggerInfra.Logger, articleRepo address.Address) *Service {
-	return &Service{
+func NewService(logger loggerInfra.Logger, articleRepo address.Address, userRepo user.User) *Service {
+	s := &Service{
 		articleRepository: articleRepo,
+		userRepository:    userRepo,
 		logger:            logger,
 		queue:             make(chan job, queueLength),
 	}
+	s.startWorkers()
+	return s
 }
 
 func (s Service) startWorkers() {
@@ -42,31 +45,44 @@ func (s Service) startWorkers() {
 
 func (s Service) worker() {
 	for job := range s.queue {
-		addrId, err := s.createAddress(context.Background(), job.address)
-		if err == nil {
-			job.addressIdChan <- addrId
+		if job.userID == 0 {
+			userID, err := s.createUser(context.Background(), job.user)
+			if err != nil {
+				//cool down queue
+				time.Sleep(100 * time.Millisecond)
+				s.queue <- job
+			}
+			job.userID = userID
+			for _, addr := range job.addresses {
+				addr.UserID = job.userID
+			}
 		}
-		userID, err := s.createUser(context.Background(), job.user)
-		if err == nil {
-			job.userIDChan <- userID
+
+		err := s.createBatchAddresses(context.Background(), job.addresses)
+		if err != nil {
+			//cool down queue
+			time.Sleep(100 * time.Millisecond)
+			s.queue <- job
 		}
+
 	}
 }
 
-// I just implemented worker pool design for createAddress because lack of time
-func (s Service) Create(address *entity.Address, user *entity.User) {
+// I just implemented worker pool design for create because lack of time
+func (s Service) Create(addresses []*entity.Address, user *entity.User) {
 	s.queue <- job{
-		address, user, make(chan<- int64), make(chan<- int64),
+		addresses: addresses,
+		user:      user,
 	}
 }
 
-func (s Service) createAddress(ctx context.Context, address *entity.Address) (int64, error) {
-	id, err := s.articleRepository.Create(ctx, address)
+func (s Service) createBatchAddresses(ctx context.Context, addresses []*entity.Address) error {
+	err := s.articleRepository.BatchCreate(ctx, addresses)
 	if err != nil {
 		s.logger.Error(err)
-		return 0, err
+		return err
 	}
-	return id, err
+	return err
 }
 
 func (s Service) createUser(ctx context.Context, user *entity.User) (int64, error) {

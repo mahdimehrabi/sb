@@ -7,6 +7,7 @@ type Address struct {
 	Country string `json:"country"`
 	Street  string `json:"street"`
 	ZipCode string `json:"zipCode"`
+	UserID  int64  `json:"userID"`
 }
 
 func NewAddress(city, state, country, street, zipCode string) *Address {
