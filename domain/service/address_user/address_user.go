@@ -3,6 +3,7 @@ package address_user
 import (
 	"context"
 	"errors"
+	"fmt"
 	"m1-article-service/domain/entity"
 	"m1-article-service/domain/repository/address"
 	"m1-article-service/domain/repository/user"
@@ -48,27 +49,40 @@ func (s Service) startWorkers() {
 
 func (s Service) worker() {
 	for job := range s.queue {
-		if job.userID == 0 {
-			userID, err := s.createUser(context.Background(), job.user)
-			if err != nil {
-				//cool down queue
-				time.Sleep(100 * time.Millisecond)
-				s.queue <- job
-			}
-			job.userID = userID
-			for _, addr := range job.addresses {
-				addr.UserID = job.userID
+		for repeat := 0; repeat < 10; repeat++ {
+			if s.work(job) {
+				break
 			}
 		}
-
-		err := s.createBatchAddresses(context.Background(), job.addresses)
-		if err != nil {
-			//cool down queue
-			time.Sleep(100 * time.Millisecond)
-			s.queue <- job
-		}
-
+		s.logger.Error(fmt.Errorf("failed to insert %s, cancelling", job))
 	}
+}
+
+func (s Service) work(job job) (done bool) {
+	defer func() {
+		if !done {
+			//cool down before retry
+			time.Sleep(500 * time.Millisecond)
+		}
+	}()
+	if job.userID == 0 {
+		userID, err := s.createUser(context.Background(), job.user)
+		if err != nil {
+			done = false
+			return
+		}
+		job.userID = userID
+		for _, addr := range job.addresses {
+			addr.UserID = job.userID
+		}
+	}
+
+	err := s.createBatchAddresses(context.Background(), job.addresses)
+	if err != nil {
+		done = false
+		return
+	}
+	return true
 }
 
 // I just implemented worker pool design for create because lack of time
