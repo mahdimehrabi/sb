@@ -4,6 +4,7 @@ import (
 	"context"
 	"m1-article-service/domain/entity"
 	"m1-article-service/domain/repository/address"
+	"m1-article-service/domain/repository/user"
 	loggerInfra "m1-article-service/infrastructure/log"
 )
 
@@ -20,7 +21,7 @@ type job struct {
 
 type Service struct {
 	articleRepository address.Address
-	userRepository    address.Address
+	userRepository    user.User
 	logger            loggerInfra.Logger
 	queue             chan job
 }
