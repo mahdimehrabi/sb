@@ -20,3 +20,6 @@ http://localhost:8080/api/users \
 }
 }' 
 ```
+
+# GET user data
+``` curl -X GET http://localhost:8080/api/users/58870 ```
