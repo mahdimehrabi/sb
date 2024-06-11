@@ -1,4 +1,4 @@
-package address
+package address_user
 
 import (
 	"context"
@@ -86,7 +86,7 @@ func BenchmarkService_Create(b *testing.B) {
 	service.Create(context.Background(), entity.NewAddress("c", "s", "co", "str", "3tgdsgds"))
 	fmt.Println(b.Elapsed())
 	if b.Elapsed() > 150*time.Microsecond {
-		b.Error("address service-create takes too long to run")
+		b.Error("address_user service-createAddress takes too long to run")
 	}
 	loggerMock.EXPECT()
 	addressRepoMock.EXPECT()
@@ -168,7 +168,7 @@ func BenchmarkService_Update(b *testing.B) {
 	service := NewService(loggerMock, addressRepoMock)
 	service.Update(context.Background(), entity.NewAddress("c", "s", "co", "str", "3tgdsgds"))
 	if b.Elapsed() > 150*time.Microsecond {
-		b.Error("address service-update takes too long to run")
+		b.Error("address_user service-update takes too long to run")
 	}
 	loggerMock.EXPECT()
 	addressRepoMock.EXPECT()
@@ -246,7 +246,7 @@ func BenchmarkService_Delete(b *testing.B) {
 	service := NewService(loggerMock, addressRepoMock)
 	service.Delete(context.Background(), int64(1))
 	if b.Elapsed() > 150*time.Microsecond {
-		b.Error("address service-delete takes too long to run")
+		b.Error("address_user service-delete takes too long to run")
 	}
 	loggerMock.EXPECT()
 	addressRepoMock.EXPECT()
@@ -316,7 +316,7 @@ func TestService_Detail(t *testing.T) {
 			}
 
 			if !gomock.Eq(resAddress).Matches(test.returnedAddress) {
-				t.Error("returned address is not right")
+				t.Error("returned address_user is not right")
 			}
 			loggerMock.EXPECT()
 			logRepoMock.EXPECT()
@@ -335,7 +335,7 @@ func BenchmarkService_Detail(b *testing.B) {
 
 	service.Detail(context.Background(), int64(1))
 	if b.Elapsed() > 150*time.Microsecond {
-		b.Error("address service-detail takes too long to run")
+		b.Error("address_user service-detail takes too long to run")
 	}
 	loggerMock.EXPECT()
 	addressRepoMock.EXPECT()
@@ -427,7 +427,7 @@ func BenchmarkService_List(b *testing.B) {
 	service := NewService(loggerMock, addressRepoMock)
 	service.List(context.Background(), uint16(1))
 	if b.Elapsed() > 150*time.Microsecond {
-		b.Error("address service-detail takes too long to run")
+		b.Error("address_user service-detail takes too long to run")
 	}
 	loggerMock.EXPECT()
 	addressRepoMock.EXPECT()
