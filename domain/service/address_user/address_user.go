@@ -29,9 +29,9 @@ type Service struct {
 	queue             chan job
 }
 
-func NewService(logger loggerInfra.Logger, articleRepo address.Address, userRepo user.User) *Service {
+func NewService(logger loggerInfra.Logger, addressRepo address.Address, userRepo user.User) *Service {
 	s := &Service{
-		articleRepository: articleRepo,
+		articleRepository: addressRepo,
 		userRepository:    userRepo,
 		logger:            logger,
 		queue:             make(chan job, queueLength),
@@ -101,22 +101,6 @@ func (s Service) createUser(ctx context.Context, user *entity.User) (int64, erro
 	return id, err
 }
 
-func (s Service) Update(ctx context.Context, article *entity.Address) error {
-	if err := s.articleRepository.Update(ctx, article); err != nil {
-		s.logger.Error(err)
-		return err
-	}
-	return nil
-}
-
-func (s Service) Delete(ctx context.Context, id int64) error {
-	if err := s.articleRepository.Delete(ctx, id); err != nil {
-		s.logger.Error(err)
-		return err
-	}
-	return nil
-}
-
 func (s Service) Detail(ctx context.Context, id int64) (*entity.Address, error) {
 	article, err := s.articleRepository.Detail(ctx, id)
 	if err != nil {
@@ -124,13 +108,4 @@ func (s Service) Detail(ctx context.Context, id int64) (*entity.Address, error) 
 		return nil, err
 	}
 	return article, nil
-}
-
-func (s Service) List(ctx context.Context, page uint16) ([]*entity.Address, error) {
-	articles, err := s.articleRepository.List(ctx, page)
-	if err != nil {
-		s.logger.Error(err)
-		return nil, err
-	}
-	return articles, err
 }

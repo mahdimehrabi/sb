@@ -1,9 +1,7 @@
-delete everything except create and detail
+test for application layer
+
+containerization
+
+docker compose
 ------
 
-test
-test benchmark
-mock
-containerization
-docker compose
-SOLID

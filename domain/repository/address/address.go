@@ -13,10 +13,6 @@ var (
 )
 
 type Address interface {
-	Create(context.Context, *entity.Address) (int64, error)
 	BatchCreate(context.Context, []*entity.Address) error
-	Update(context.Context, *entity.Address) error
-	Delete(context.Context, int64) error
 	Detail(context.Context, int64) (*entity.Address, error)
-	List(context.Context, uint16) ([]*entity.Address, error)
 }

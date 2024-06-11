@@ -9,10 +9,10 @@ import (
 import "github.com/gin-gonic/gin"
 
 type AddressUser struct {
-	addrService address_user.Service
+	addrService *address_user.Service
 }
 
-func NewAddressUser(addrService address_user.Service) *AddressUser {
+func NewAddressUser(addrService *address_user.Service) *AddressUser {
 	return &AddressUser{addrService: addrService}
 }
 
